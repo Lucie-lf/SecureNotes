@@ -1,8 +1,9 @@
-import User from '../models/user.js';
+import { User } from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
+import { generateJWTToken } from '../utils/generateJWTToken.js';
 
-export const signup = (req, res) => {
+export const signup = async (req, res) => {
     const { name, email, password } = req.body;
     try {
         if (!name || !email || !password) {
@@ -27,8 +28,21 @@ export const signup = (req, res) => {
 
         generateJWTToken(res, user._id);
 
+        res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            user: {
+                ...user._doc,
+                password: undefined, // Exclude password from response
+            }
+        });
     } catch (error) {
-}
+        res.status(400).json({ 
+            success: false,
+            message: error.message 
+        });
+    }
+};
 
 export const login = (req, res) => {
     res.send('Login route');
