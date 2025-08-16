@@ -47,8 +47,35 @@ export const signup = async (req, res) => {
     }
 };
 
-export const login = (req, res) => {
-    res.send('Login route');
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'User not found' });
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Invalid password' });
+        }
+        const isVerified = user.isVerified;
+        if (!isVerified) {
+            return res.status(400).json({ message: 'Email not verified' });
+        }
+
+        generateJWTToken(res, user._id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Login successful',
+        });
+    } catch (error) {
+        console.log("Error during login:", error);
+        res.status(400).json({ 
+            success: false,
+            message: 'Login failed' 
+        });
+    }
 }
 
 export const logout = (req, res) => {
