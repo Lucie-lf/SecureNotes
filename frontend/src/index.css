@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Pirata+One&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+    --color-ciel: #99B7CF;
+    --color-blood: #461518;
+    --color-vert: #C0C197;
+
+    
+    --color-nape: #E7DFD2;
+    --color-napeO: #f25f5c;
+
+    --font-pirata: 'Pirata One', normal;
+    --font-gara: 'EB Garamond', serif;
+}
