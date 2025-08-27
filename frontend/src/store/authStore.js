@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { verifyEmail } from "../../../backend/controllers/auth-controller";
+
 
 const API_URL = 'http://localhost:3000/api/auth';
 
