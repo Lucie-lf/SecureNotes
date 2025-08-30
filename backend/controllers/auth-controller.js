@@ -52,15 +52,15 @@ export const login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Invalid password' });
+            return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
         const isVerified = user.isVerified;
         if (!isVerified) {
-            return res.status(400).json({ message: 'Email not verified' });
+            return res.status(400).json({ success: false, message: 'Email not verified' });
         }
 
         generateJWTToken(res, user._id);
@@ -69,6 +69,7 @@ export const login = async (req, res) => {
             success: true,
             message: 'Login successful',
         });
+
     } catch (error) {
         console.log("Error during login:", error);
         res.status(400).json({ 
@@ -119,5 +120,18 @@ export const verifyEmail = async (req, res) => {
             success: false,
             message: 'Failed to verify email' 
         });
+    }
+}
+
+export const checkAuth = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user){
+            return res.status(400).json({ success: false, message: "User not found"});
+        }
+        res.status(200).json({success: true, user: {...user._doc, password: undefined}});
+    } catch (error) {
+        console.log("error checking auth", error);
+        res.status(400).json({success: false, message: error.message});
     }
 }

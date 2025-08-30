@@ -12,14 +12,7 @@ export default function VerificationEMailPage() {
     const handleSubmit = async () => {
         await verifyEmail(inputCode);
         if(!error && !isLoading) {
-            toast({
-                title: "Email verified",
-                description: "Your email has been verified successfully !",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
-            })
-
+            navigate("/dashboard");
         };
     };
 

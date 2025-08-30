@@ -1,16 +1,13 @@
 import { create } from "zustand";
 
-const API_URL = 'http://localhost:3000/api/auth';
+const API_URL = 'http://localhost:3000/api/notes';
 
-export const useAuthStore = create((set) => ({
-    user: null,
+export const useNoteStore = create((set, get) => ({
+    notes: [],
     isLoading: false,
     error: null,
-    isAuthenticated: false,
-    isCheckingAuth: true,
-    message: null,
 
-    signup: async (name, email, password) => {
+    loadNotes: async (token) => {
         set({ isLoading: true, error: null });
         try {
             const response = await fetch(`${API_URL}/signup`, {
