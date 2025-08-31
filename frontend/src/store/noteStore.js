@@ -114,6 +114,7 @@ export const useNoteStore = create((set) => ({
             }));
         } catch (error) {
             set ({ error: error.message});
+            console.log(error);
         }
     },
 

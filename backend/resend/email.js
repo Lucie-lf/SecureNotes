@@ -4,7 +4,7 @@ import { verificationTokenEmailTemplate, WELCOME_EMAIL_TEMPLATE } from "./email-
 export const sendVerificationEmail = async (email, verificationToken) => {
     try {
         const { data, error } = await resend.emails.send({
-            from: "Acme <onboarding@resend.dev>",
+            from: "SecureNotes <onboarding@sharedfolders.online>",
             to: [email],
             subject: "Verification de votre compte",
             html: verificationTokenEmailTemplate.replace("{verificationToken}", verificationToken),
@@ -18,7 +18,7 @@ export const sendVerificationEmail = async (email, verificationToken) => {
 export const sendWelcomeEmail = async (email, name) => {
     try {
         const { data, error } = await resend.emails.send({
-            from: "Acme <onboarding@resend.dev>",
+            from: "SecureNotes <onboarding@sharedfolders.online>",
             to: [email],
             subject: "Welcome to SecureNotes",
             html: WELCOME_EMAIL_TEMPLATE.replace("{name}", name),

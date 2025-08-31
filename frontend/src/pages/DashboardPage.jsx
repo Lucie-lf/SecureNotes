@@ -17,16 +17,17 @@ const DashboardPage = () => {
     }
 
     const handleCreateNote = async () => {
-       const title = "Titre";
-       const body = "Contenu...";
-       await createNote(title, body);
+        const title = "Titre";
+        const body = "Contenu...";
+        await createNote(title, body);
+        await getNotes();
     };
 
 
     return(
         <div className="flex flex-col h-screen w-screen bg-blood">
             <Header/>
-            <div className="h-screen w-screen grid grid-cols-4 gap-5 p-5">
+            <div className="h-screen w-screen grid grid-cols-4 gap-5 p-5 overflow-y-auto">
                 {notes.map(notes => (
                     <Card 
                         key={notes._id}

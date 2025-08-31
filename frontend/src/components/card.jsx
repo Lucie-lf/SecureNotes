@@ -27,14 +27,14 @@ const handleChangeBody = (e) => {
 const handleSauv = async (e) => {
     if (e.key === 'Enter'|| e.type === 'blur') {
         e.preventDefault();
-        await updateNote(_id, { title: editedTitle }, { body: editedBody });
+        await updateNote(_id, editedTitle, editedBody );
         setIsEditing(false);
     }
 }
 
     return (
         <div className="flex flex-col gap-2 bg-blood">
-            <div className="flex flex-col justify-between bg-nape rounded-xs p-5 h-full">
+            <div className="flex flex-col justify-between bg-nape rounded-xs p-5 h-full overflow-hidden">
                 <div className="gap-1">
                     <textarea 
                         className="text-ciel w-full font-gara text-xl resize-none border-none outline-none cursor-pointer"

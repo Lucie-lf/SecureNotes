@@ -17,6 +17,7 @@ export const signup = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = generateVerificationToken();
+        console.log("Verification Token:", verificationToken);
         const user = new User({
             name,
             email,

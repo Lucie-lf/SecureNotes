@@ -1,12 +1,21 @@
 import { Note } from '../models/notes.js';
+import CryptoJS from 'crypto-js';
 
 export const getNotes = async (req, res) => {
     try {
-        console.log("req.userId =", req.userId);
         const notes = await Note.find ({ user: req.userId });
-        console.log("notes found =", notes);
+        
+        const decryptedNotes = notes.map(note => {
+            const decryptedBody = CryptoJS.AES.decrypt(note.body, process.env.CRYPT_SECRET).toString(CryptoJS.enc.Utf8);
+            return {
+                ...note._doc,
+                body: decryptedBody,
+            };
+        });
+        
+        
         res.status(200).json({
-            success: true, notes
+            success: true, notes: decryptedNotes,
         });
     } catch (error) {
         console.log(error);
@@ -19,13 +28,17 @@ export const getNotes = async (req, res) => {
 
 export const getNoteById = async (req, res) => {
     try {
-        const note = await Note.findById({ _id: req.params.id });
+        const note = await Note.findOne({ _id: req.params.id, user: req.userId });
         if (!note) {
             return res.status(404).json({ success: false, message: 'Note introuvable' });
         }
+        const decryptedBody = CryptoJS.AES.decrypt(note.body, process.env.CRYPT_SECRET).toString(CryptoJS.enc.Utf8);
         res.status(200).json({
             success: true,
-            note
+            note: {
+                ...note._doc,
+                body: decryptedBody,
+            }
         });
 
     } catch (error) {
@@ -39,12 +52,18 @@ export const getNoteById = async (req, res) => {
 
 export const createNote = async (req, res) => {
     try {
-        console.log("req.body:", req.body);
-        const note = await Note.create({ ...req.body, user: req.userId });
+        const { title, body } = req.body;
+        const encryptedBody = CryptoJS.AES.encrypt(body, process.env.CRYPT_SECRET).toString();
+        console.log("Encrypted body:", encryptedBody);
+
+        const note = await Note.create({ title, body: encryptedBody, user: req.userId });
+        console.log("Body stored in DB:", note.body);
+        
         res.status(201).json({ 
             success: true, 
-            note 
-        })
+            note: { ...note._doc, body },
+        });
+        console.log("Body stored in DB:", note.body);
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -56,11 +75,15 @@ export const createNote = async (req, res) => {
 
 export const updateNote = async (req, res) => {
     try {
+        const { title, body } = req.body;
+        const encryptedBody = CryptoJS.AES.encrypt(body, process.env.CRYPT_SECRET).toString()
+            
         const note = await Note.findOneAndUpdate(
             { _id: req.params.id, user: req.userId },
-            req.body,
+            { title, body: encryptedBody },
             { new: true }
         );
+
         if (!note) {
             return res.status(404).json({ 
                 success: false,
@@ -68,7 +91,7 @@ export const updateNote = async (req, res) => {
             })};
         res.status(200).json({
             success: true,
-            note
+            note: { ...note._doc, body },
         });
     } catch (error) {
         console.log(error);
@@ -94,20 +117,19 @@ export const deleteNote = async (req, res) => {
 
 export const searchNotes = async (req, res) => {
     try {
-        let query = req.query.q;
+        const query = req.query.q || "";
         
-        if (!query || query.trim() === "") {
-            query = "";
-        }
         const notes = await Note.find({ 
             user: req.userId,
-            $or: [
-                { title: { $regex: query, $options: "i"}},
-                { body: { $regex: query, $options: "i"}},
-
-            ],
+            title: { $regex: query, $options: "i"},
         });
-        res.status(200).json({success: true, notes});
+
+        const decryptedNotes = notes.map(note => ({ 
+            ...note._doc,
+            body: CryptoJS.AES.decrypt(note.body, process.env.CRYPT_SECRET).toString(CryptoJS.enc.Utf8),
+        }));
+
+        res.status(200).json({success: true, notes: decryptedNotes });
     } catch (error) {
         console.log(error);
         res.status(400).json({success: false, message: "sEARCH FAILED"});

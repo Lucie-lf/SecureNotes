@@ -17,11 +17,11 @@ const handleSearch = async () => {
 };
 
     return (
-        <header className="flex flex-row justify-between m-5 items-center">
+        <header className="flex flex-row justify-between m-5 items-center gap-5">
             <p className="text-ciel font-gara text-2xl">{user.name}'s secret notes.</p>
-            <div className="flex flex-row gap-2 items-center bg-nape rounded-xs p-1">
+            <div className="flex flex-row w-[70%] bg-nape rounded-xs p-1">
                 <input 
-                    className="bg-none outline-none font-gara text-blood placeholder:text-blood px-2"
+                    className="bg-none flex flex-grow outline-none font-gara text-blood placeholder:text-blood px-2"
                     placeholder="Search..."
                     value={inputSearch}
                     onChange={(e) => setInputSearch(e.target.value)}
