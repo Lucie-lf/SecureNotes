@@ -94,7 +94,11 @@ export const deleteNote = async (req, res) => {
 
 export const searchNotes = async (req, res) => {
     try {
-        const query = req.query.q;
+        let query = req.query.q;
+        
+        if (!query || query.trim() === "") {
+            query = "";
+        }
         const notes = await Note.find({ 
             user: req.userId,
             $or: [

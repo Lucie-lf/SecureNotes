@@ -2,63 +2,41 @@ import { create } from "zustand";
 
 const API_URL = 'http://localhost:3000/api/notes';
 
-export const useNoteStore = create((set, get) => ({
+export const useNoteStore = create((set) => ({
     notes: [],
     isLoading: false,
     error: null,
 
-    loadNotes: async (token) => {
-        set({ isLoading: true, error: null });
-        try {
-            const response = await fetch(`${API_URL}/signup`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({ name, email, password }),
-            });
-            const data = await response.json();
-            set({ isLoading: false, isAuthenticated: true, user: data.user });
-        } catch (error) {
-            set({ isLoading: false, error: error.message });
-            console.log(error);
-            throw error;
-        }
-    },
-
-    verifyEmail: async (code) => {
+    getNotes: async () => {
         set({ isLoading: true, error: null});
         try {
-            const response = await fetch(`${API_URL}/verify-email`, {
-                method: 'POST',
+            const response = await fetch(`${API_URL}/`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({code}),
             });
             const data = await response.json();
-            set({isLoading: false, isAuthenticated: true, user: data.user});
+            set({isLoading: false, notes: data.notes || [] });
         } catch (error) {
             set({isLoading: false, error: error.message})
             console.log(error);
         }
     },
 
-    login: async (email, password) => {
+    getNoteById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch(`${API_URL}/login`, {
-                method: 'POST',
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({ email, password }),
             });
             const data = await response.json();
-            set({ isLoading: false, isAuthenticated: true, user: data.user });
+            return data.note;
         } catch (error) {
             set({ isLoading: false, error: error.message });
             console.log(error);
@@ -66,42 +44,93 @@ export const useNoteStore = create((set, get) => ({
         }
     },
 
-    checkAuth: async () => {
-        set({ isCheckingAuth: true, error: null });
+    createNote: async (title, body) => {
         try {
-            const response = await fetch(`${API_URL}/check-auth`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-            });
-            const data = await response.json();
-            if (data.user) {
-                set({ isAuthenticated: true, user: data.user, isCheckingAuth: false});
-            } else {
-                set({ isAuthenticated: false, user: null, isCheckingAuth: false});
-            }
-        } catch (error) {
-            set({ isCheckingAuth: false, isAuthenticated: false, user: null});
-            console.log(error);
-        }
-    },
-
-    logout: async () => {
-        set({ isLoading: true, error: null });
-        try {
-            const response = await fetch(`${API_URL}/logout`, {
+            const response = await fetch(`${API_URL}/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 credentials: "include",
+                body: JSON.stringify({ title, body }),
             });
-            set({ isLoading: false, isAuthenticated: false, user: null});
+            const data = await response.json();
+            set((state) => ({
+                notes: [...state.notes, data.note],
+            }));
         } catch (error) {
-            set ({ isLoading: false, error: error.message});
-            throw error;
+            set({ error: error.message });
+            console.log(error);
         }
-    }
+    },
+
+    searchNotes: async (input) => {
+        try {
+            const response = await fetch(`${API_URL}/search`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ searchTerm: input }),
+            });
+            const data = await response.json();
+            set({ notes: data.searchResults });
+        } catch (error) {
+            set ({ error: error.message});
+        }
+    },
+
+    searchNotes: async (input) => {
+        try {
+            const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(input)}`, {
+                method: "GET",
+                
+                credentials: "include",
+            });
+            const data = await response.json();
+            set({ notes: data.notes || [] });
+        } catch (error) {
+            set ({ error: error.message});
+            console.log(error);
+        }
+    },
+
+    updateNote: async (id, title, body) => {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ title, body }),
+            });
+            const data = await response.json();
+            set((state) => ({
+                notes: state.notes.map((note) =>
+                    note._id === id ? data.note : note
+                ),
+            }));
+        } catch (error) {
+            set ({ error: error.message});
+        }
+    },
+
+    deleteNote: async (id) => {
+        try {
+            await fetch(`${API_URL}/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            });
+            set((state) => ({
+                notes: state.notes.filter((note) => note._id !== id),
+            }));
+        } catch (error) {
+            set ({ error: error.message});
+        }
+    },
 }));
