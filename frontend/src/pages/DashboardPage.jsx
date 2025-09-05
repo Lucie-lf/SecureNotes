@@ -5,16 +5,18 @@ import Header from '../components/header';
 import Card from '../components/card';
 
 const DashboardPage = () => {
-    const { isCheckingAuth} = useAuthStore();
+    const { user, isCheckingAuth} = useAuthStore();
     const { notes, getNotes, createNote } = useNoteStore();
+
+    console.log(user);
+    if (isCheckingAuth) {
+        return <div>Loading...</div>
+    }
 
     useEffect(() => {
         getNotes();
     }, []);
-
-    if (isCheckingAuth) {
-        return <div>Loading...</div>
-    }
+    
 
     const handleCreateNote = async () => {
         const title = "Titre";

@@ -42,10 +42,11 @@ export const useAuthStore = create((set) => ({
                 body: JSON.stringify({code}),
             });
             const data = await response.json();
+            console.log("Email verification response:", data);
             set({isLoading: false, isAuthenticated: true, user: data.user});
         } catch (error) {
             set({isLoading: false, error: error.message})
-            console.log(error);
+            console.log("verifyEmail error:", error);
         }
     },
 

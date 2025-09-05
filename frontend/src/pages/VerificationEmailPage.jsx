@@ -1,18 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import lettre from '../assets/lettre.png';
 
-export default function VerificationEmailPage() {
+export function VerificationEmailPage() {
     const [inputCode, setInputCode] = useState("");
-    const { verifyEmail, isLoading, error, user } = useAuthStore();
+    const { verifyEmail, isLoading, error } = useAuthStore();
     const navigate = useNavigate();
-
     const handleSubmit = async () => {
-        const success = await verifyEmail(inputCode);
-        if(success) {
-            navigate("/dashboard");
-        }
+        await verifyEmail(inputCode);
+        navigate('/dashboard');
     };
 
     return(
@@ -42,9 +39,8 @@ export default function VerificationEmailPage() {
                     
                     <button 
                         className="border-1 px-2 w-fit place-self-center rounded-full font-gara border-ciel text-ciel hover:bg-ciel hover:text-blood cursor-pointer"
-                        type="submit"
                         onClick={handleSubmit}
-                        disabled={isLoading}>
+                        >
                         {isLoading ? "VERIFYING..." : "SUBMIT"}
                     </button>
                 </div>

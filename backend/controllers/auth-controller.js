@@ -59,8 +59,8 @@ export const login = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
-        const isVerified = user.isVerified;
-        if (!isVerified) {
+        const isEmailVerified = user.isEmailVerified;
+        if (!isEmailVerified) {
             return res.status(400).json({ success: false, message: 'Email not verified' });
         }
 
@@ -105,7 +105,7 @@ export const verifyEmail = async (req, res) => {
         }
         console.log("User found:", user);
         // Mark user as verified
-        user.isVerified = true;
+        user.isEmailVerified = true;
         user.verificationToken = undefined; // Clear the token after verification
         user.verificationExpiresAt = undefined; // Clear the expiration date
         await user.save();
